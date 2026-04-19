@@ -7,7 +7,7 @@ import os
 
 @CrewBase
 class HealthAssistantCrew:
-    """Health Assistant crew using @CrewBase YAML pattern."""
+    """使用 @CrewBase YAML 配置模式的健康助手团队"""
 
     agents: list[BaseAgent]
     tasks: list[Task]
@@ -40,7 +40,7 @@ class HealthAssistantCrew:
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Health Assistant crew"""
+        """创建健康助手团队"""
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
@@ -49,38 +49,38 @@ class HealthAssistantCrew:
         )
 
     def analyze_food_image(self, image_path: str, api_key: str = None) -> Dict[str, Any]:
-        """Run the crew to analyze a food image."""
+        """运行团队分析食物图片"""
         if not os.path.exists(image_path):
-            raise FileNotFoundError(f"Image not found: {image_path}")
+            raise FileNotFoundError(f"图片未找到: {image_path}")
 
         if not api_key:
             api_key = os.getenv("DASHSCOPE_API_KEY")
         if not api_key:
-            raise ValueError("DASHSCOPE_API_KEY environment variable is not set")
+            raise ValueError("未设置 DASHSCOPE_API_KEY 环境变量")
 
-        # Get task instances
+        # 获取任务实例
         vision_task = self.food_identification_task()
         nutrition_task = self.food_nutrition_task()
 
-        # Update vision task description with image path
+        # 更新图像识别任务描述，包含图片路径
         vision_task.description = f"""
-        Analyze the uploaded food image and identify all food items present.
+        分析上传的食物图片，识别出所有存在的食物项目。
 
-        Image path: {image_path}
+        图片路径: {image_path}
 
-        For each item, describe:
-        1. Name of the food
-        2. Cooking method (if applicable)
-        3. Estimated portion size
-        4. Key ingredients visible
+        对于每种食物，请描述：
+        1. 食物名称
+        2. 烹饪方式（如适用）
+        3. 估计份量大小
+        4. 可见的关键配料
 
-        Return your analysis in a structured format.
+        请以结构化格式返回分析结果。
         """
 
-        # Set task context for sequential processing
+        # 设置任务上下文以实现顺序处理
         nutrition_task.context = [vision_task]
 
-        # Create crew with updated tasks
+        # 使用更新后的任务创建团队
         analysis_crew = Crew(
             agents=self.agents,
             tasks=[vision_task, nutrition_task],

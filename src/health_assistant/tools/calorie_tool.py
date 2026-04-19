@@ -5,13 +5,13 @@ import os
 
 
 class CalorieCalculatorTool(BaseTool):
-    """Tool for calculating calories and nutrition."""
+    """用于计算食物卡路里和营养素的工具"""
 
     name: str = "calorie_calculator"
-    description: str = "Calculates estimated calories and nutritional values for food items"
+    description: str = "计算食物的估计卡路里和营养值"
 
     def _run(self, food_name: str, portion_size: str = "medium") -> Dict[str, Any]:
-        """Calculate nutrition for a given food."""
+        """计算给定食物的营养信息"""
         api_key = os.getenv("DASHSCOPE_API_KEY")
         llm = LLM(
             model="dashscope/qwen-plus",
@@ -19,18 +19,18 @@ class CalorieCalculatorTool(BaseTool):
         )
 
         prompt = f"""
-        Calculate the nutritional information for:
-        Food: {food_name}
-        Portion: {portion_size}
+        计算以下食物的营养信息：
+        食物：{food_name}
+        份量：{portion_size}
 
-        Provide:
-        - Calories (kcal)
-        - Protein (g)
-        - Carbohydrates (g)
-        - Fat (g)
-        - Fiber (g)
+        请提供：
+        - 卡路里（千卡）
+        - 蛋白质（克）
+        - 碳水化合物（克）
+        - 脂肪（克）
+        - 纤维（克）
 
-        Respond in JSON format.
+        请以 JSON 格式回复。
         """
 
         response = llm.chat(prompt)

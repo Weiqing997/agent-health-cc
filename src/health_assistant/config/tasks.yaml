@@ -1,24 +1,23 @@
 food_identification_task:
   description: |
-    Analyze the uploaded food image and identify all food items present.
-    For each item, describe:
-    1. Name of the food
-    2. Cooking method (if applicable)
-    3. Estimated portion size
-    4. Key ingredients visible
+    分析上传的食物图片，识别出所有存在的食物项目。
+    对于每种食物，请描述：
+    1. 食物名称
+    2. 烹饪方式（如适用）
+    3. 估计份量大小
+    4. 可见的关键配料
   expected_output: |
-    A detailed list of all identified food items with descriptions including
-    name, cooking method, portion size, and key ingredients for each item.
+    详细列出所有已识别的食物项目及其描述，包括
+    每种食物的名称、烹饪方式、份量大小和关键配料。
   agent: food_vision_agent
 
 food_nutrition_task:
   description: |
-    Based on the identified food items from the previous task, calculate:
-    1. Estimated calories for each item
-    2. Macronutrient breakdown (protein, carbs, fat)
-    3. Total calorie count
-    4. Any notable nutritional highlights or concerns
+    根据上一个任务中已识别的食物项目，计算：
+    1. 每种食物的估计热量
+    2. 宏量营养素分解（蛋白质、碳水化合物、脂肪）
+    3. 总热量
+    4. 任何值得注意的营养亮点或问题
   expected_output: |
-    Complete nutritional breakdown with calorie estimates for each item
-    and total calorie count.
+    完整的营养分解，包括每种食物的热量估算和总热量。
   agent: nutrition_analysis_agent

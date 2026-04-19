@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python -m src.health_assistant.main)",
+      "Bash(python -c ' *)",
+      "Bash(python *)",
+      "Bash(pip show *)",
+      "Bash(git init *)",
+      "mcp__github__get_me",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "mcp__github__create_repository",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "WebSearch",
+      "WebFetch(domain:docs.crewai.com)",
+      "WebFetch(domain:pypi.org)",
+      "mcp__github__search_repositories",
+      "Bash(crewai --help)",
+      "Bash(crewai create *)"
+    ]
+  }
+}
