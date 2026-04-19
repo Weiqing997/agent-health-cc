@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "health-assistant"
+version = "0.1.0"
+description = "Multi-agent health assistant using CrewAI"
+requires-python = ">=3.10"
+dependencies = [
+    "crewai>=0.80.0",
+    "langchain-openai>=0.3.0",
+    "pillow>=10.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
