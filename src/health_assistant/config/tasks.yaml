@@ -6,11 +6,10 @@ food_identification_task:
     2. Cooking method (if applicable)
     3. Estimated portion size
     4. Key ingredients visible
-
-    Image path: {image_path}
-
   expected_output: |
-    A detailed list of all identified food items with descriptions
+    A detailed list of all identified food items with descriptions including
+    name, cooking method, portion size, and key ingredients for each item.
+  agent: food_vision_agent
 
 food_nutrition_task:
   description: |
@@ -19,17 +18,7 @@ food_nutrition_task:
     2. Macronutrient breakdown (protein, carbs, fat)
     3. Total calorie count
     4. Any notable nutritional highlights or concerns
-
   expected_output: |
-    Complete nutritional breakdown with calorie estimates
-
-daily_summary_task:
-  description: |
-    Compile all analyzed food items into a daily meal summary.
-    Include:
-    1. Total calories for the meal
-    2. Meal composition analysis
-    3. General health assessment based on the meal
-
-  expected_output: |
-    A comprehensive daily meal summary and health insights
+    Complete nutritional breakdown with calorie estimates for each item
+    and total calorie count.
+  agent: nutrition_analysis_agent

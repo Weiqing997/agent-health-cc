@@ -1,79 +1,92 @@
-from crewai import Crew, Task, Process
-from typing import Dict, Any, List
+from crewai import Agent, Crew, Process, Task
+from crewai.project import CrewBase, agent, crew, task
+from crewai.agents.agent_builder.base_agent import BaseAgent
+from typing import Dict, Any
 import os
 
-from .agents.food_vision_agent import FoodVisionAgent
-from .agents.nutrition_agent import NutritionAnalysisAgent
 
-
+@CrewBase
 class HealthAssistantCrew:
-    """Main crew for the health assistant, coordinating multiple agents."""
+    """Health Assistant crew using @CrewBase YAML pattern."""
 
-    def __init__(self):
-        self.food_vision_agent = FoodVisionAgent()
-        self.nutrition_agent = NutritionAnalysisAgent()
+    agents: list[BaseAgent]
+    tasks: list[Task]
 
-    def _create_vision_task(self, image_path: str) -> Task:
-        """Create the food identification task."""
-        return Task(
-            description=f"""
-            Analyze the uploaded food image and identify all food items present.
-
-            Image path: {image_path}
-
-            For each item, describe:
-            1. Name of the food
-            2. Cooking method (if applicable)
-            3. Estimated portion size
-            4. Key ingredients visible
-
-            Return your analysis in a structured format.
-            """,
-            agent=self.food_vision_agent.create_agent(),
-            expected_output="A detailed list of all identified food items with descriptions",
+    @agent
+    def food_vision_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['food_vision_agent'],
+            verbose=True
         )
 
-    def _create_nutrition_task(self, context: List[Any]) -> Task:
-        """Create the nutrition analysis task."""
-        return Task(
-            description="""
-            Based on the identified food items, calculate detailed nutritional information.
-
-            Calculate for each item:
-            1. Estimated calories
-            2. Macronutrients (protein, carbs, fat)
-            3. Total calorie count
-
-            Provide a complete nutritional breakdown.
-            """,
-            agent=self.nutrition_agent.create_agent(),
-            expected_output="Complete nutritional breakdown with calorie estimates",
-            context=context,
+    @agent
+    def nutrition_analysis_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['nutrition_analysis_agent'],
+            verbose=True
         )
 
-    def analyze_food_image(self, image_path: str) -> Dict[str, Any]:
+    @task
+    def food_identification_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['food_identification_task'],
+        )
+
+    @task
+    def food_nutrition_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['food_nutrition_task'],
+        )
+
+    @crew
+    def crew(self) -> Crew:
+        """Creates the Health Assistant crew"""
+        return Crew(
+            agents=self.agents,
+            tasks=self.tasks,
+            process=Process.sequential,
+            verbose=True,
+        )
+
+    def analyze_food_image(self, image_path: str, api_key: str = None) -> Dict[str, Any]:
         """Run the crew to analyze a food image."""
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
 
-        # Create tasks
-        vision_task = self._create_vision_task(image_path)
-        nutrition_task = self._create_nutrition_task(context=[vision_task])
+        if not api_key:
+            api_key = os.getenv("DASHSCOPE_API_KEY")
+        if not api_key:
+            raise ValueError("DASHSCOPE_API_KEY environment variable is not set")
 
-        # Create and run the crew
-        crew = Crew(
-            agents=[
-                self.food_vision_agent.create_agent(),
-                self.nutrition_agent.create_agent(),
-            ],
+        # Get task instances
+        vision_task = self.food_identification_task()
+        nutrition_task = self.food_nutrition_task()
+
+        # Update vision task description with image path
+        vision_task.description = f"""
+        Analyze the uploaded food image and identify all food items present.
+
+        Image path: {image_path}
+
+        For each item, describe:
+        1. Name of the food
+        2. Cooking method (if applicable)
+        3. Estimated portion size
+        4. Key ingredients visible
+
+        Return your analysis in a structured format.
+        """
+
+        # Set task context for sequential processing
+        nutrition_task.context = [vision_task]
+
+        # Create crew with updated tasks
+        analysis_crew = Crew(
+            agents=self.agents,
             tasks=[vision_task, nutrition_task],
             process=Process.sequential,
             verbose=True,
         )
 
-        result = crew.kickoff()
-
-        return {
-            "result": result,
-            "image_path": image_path
-        }
+        result = analysis_crew.kickoff()
+        return {"result": result, "image_path": image_path}

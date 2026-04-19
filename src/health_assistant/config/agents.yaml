@@ -6,12 +6,15 @@ food_vision_agent:
     You have a keen eye for detail and can accurately identify various food items,
     their cooking methods, and estimate portion sizes from photos.
   verbose: true
+  allow_delegation: false
+  llm: dashscope/qwen-vl-plus
 
 nutrition_analysis_agent:
   role: "Nutrition Data Analyst"
   goal: "Provide accurate calorie and nutritional information based on identified food items"
   backstory: |
     You are a certified nutritionist and dietitian with extensive knowledge of
-    food composition, caloric content, and nutritional values. You can quickly
-    lookup and calculate nutritional information for any food item.
+    food composition, caloric content, and nutritional values.
   verbose: true
+  allow_delegation: false
+  llm: dashscope/qwen-plus
